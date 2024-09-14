@@ -1,5 +1,5 @@
 # dns-traffic-analysis
-PCAP analysis tool to find slow DNS queries
+PCAP analysis tools to find DNS queries with high latency
 
 # Overview
 Often clients task engineers with determining what DNS queries are slow in an environment when a customer complains about resolution issues. This can often lead to long drawn out troubleshooting sessions involving tcpdump and wireshark coupled with long customer engagements. The following tools can be used to minimize investigation time and assist in reporting on details directly from the CLI
@@ -16,31 +16,31 @@ Often clients task engineers with determining what DNS queries are slow in an en
   - displays contents pcap DNS packets to stdout
 
 ## Requirements
- - [scapy] (https://scapy.net/)
- - [tqdm] (https://github.com/tqdm/tqdm)
+ - [scapy](https://scapy.net/)
+ - [tqdm](https://github.com/tqdm/tqdm)
 
 ## Recommended Setup 
 ### Clone repository
-1. ** Open your favorite terminal **
-2. ** Clone git repository **
+1. **Open your favorite terminal**
+2. **Clone git repository**
 ```
 git clone https://github.com/mragusa/dns-traffic-analysis.git
 ```
-3. ** Change to dns-traffic-analysis directory **
+3. **Change to dns-traffic-analysis directory**
 ```
 cd ~/dns-traffic-analysis
 ```
 ### Create Python Virtual Environment
-4. ** Create python [venv] (https://docs.python.org/3/library/venv.html) environment **
+4. **Create python [venv](https://docs.python.org/3/library/venv.html) environment**
 ```
 python3 -m venv venv
 ```
-5. ** Activate venv **
+5. **Activate venv**
 ```
 source ~/dns-traffic-analysis/venv/bin/activate
 ```
 ### Install required pip modules
-6. ** Install required modules **
+6. **Install required modules**
 ```
 pip install -r requirements.txt
 ```
