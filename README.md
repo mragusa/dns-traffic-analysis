@@ -11,18 +11,26 @@ Often clients task engineers with determining what DNS queries are slow in an en
   - writes total queries and slow queries found to files for review
   - imports cProfile module for deeper dive into script internals
 * dns-splitter.py
-  - utilizes a query ID to seperate DNS queries from larger pcap into smaller pcap file for review
+  - utilizes a query ID to seperate query and response packets from a larger pcap into a smaller file for review
 * dns-packet-parser.py
-  - displays contents pcap DNS packets to stdout
+  - reads pcap file and displays DNS packet content to stdout
 
 ## Requirements
  - [scapy](https://scapy.net/)
  - [tqdm](https://github.com/tqdm/tqdm)
 
+## Additional tools that may be helpful
+  - [wireshark](https://www.wireshark.org/)
+
 ## Recommended Setup 
 ### Clone repository
 1. **Open your favorite terminal**
-2. **Clone git repository**
+  - [Alacritty](https://alacritty.org/)
+  - [iTerm2](https://iterm2.com/)
+  - [Terminal](https://support.apple.com/guide/terminal/welcome/mac)
+  - [List of Terminal Emulators](https://en.wikipedia.org/wiki/List_of_terminal_emulators)
+
+2. **Clone [git](https://git-scm.com/doc) repository**
 ```
 git clone https://github.com/mragusa/dns-traffic-analysis.git
 ```
