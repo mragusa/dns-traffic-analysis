@@ -16,7 +16,7 @@ def find_dns_servers(packet):
                 dns_servers_found[packet["IP"].dst] = 1
 
 
-def main(file, display):
+def main(file, display, count):
     if file:
         packet_file = rdpcap(file)
         for packet in packet_file:
@@ -25,8 +25,20 @@ def main(file, display):
             sorted(dns_servers_found.items(), key=lambda item: item[1], reverse=True)
         )
         if display:
-            for n in sorted_dns_servers:
-                print("DNS Servers: {} Count: {}".format(n, sorted_dns_servers[n]))
+            if count:
+                c = 0
+                while c < count:
+                    for n in sorted_dns_servers:
+                        print(
+                            "DNS Server: {} Count: {}".format(n, sorted_dns_servers[n])
+                        )
+                        if c == count:
+                            break
+                        else:
+                            c += 1
+            else:
+                for n in sorted_dns_servers:
+                    print("DNS Server: {} Count: {}".format(n, sorted_dns_servers[n]))
         else:
             print("Total DNS servers found: {}".format(len(sorted_dns_servers)))
     else:
@@ -47,9 +59,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "-d", "--display", action="store_true", help="display dns servers found"
     )
+    parser.add_argument(
+        "-c", "--count", type=int, help="display x amount of dns servers"
+    )
     args = parser.parse_args()
 
     if args.profile:
-        cProfile.run("main(args.file, args.display)")
+        cProfile.run("main(args.file, args.display, args.count)")
     else:
-        main(args.file, args.display)
+        main(args.file, args.display, args.count)
