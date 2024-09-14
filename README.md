@@ -19,6 +19,13 @@ Clients frequently ask engineers to identify slow DNS queries in response to cus
  - Python 3.8 or higher.
  - [scapy](https://scapy.net/)
  - [tqdm](https://github.com/tqdm/tqdm)
+ - [tcpdump](https://www.tcpdump.org/) pcap file
+
+## Considerations
+In the event a pcap file in extremely large, 100+ MB, consider breaking the file into smaller parts
+```
+tcpdump -r traffic.cap -w slow_queries -C 10M
+```
 
 ## Additional tools that may be helpful
   - [wireshark](https://www.wireshark.org/)
