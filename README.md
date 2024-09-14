@@ -5,15 +5,15 @@ PCAP analysis tool to find slow DNS queries
 Often clients task engineers with determining what DNS queries are slow in an environment when a customer complains about resolution issues. This can often lead to long drawn out troubleshooting sessions involving tcpdump and wireshark coupled with long customer engagements. The following tools can be used to minimize investigation time and assist in reporting on details directly from the CLI
 
 * find-dns-server.py
- - read a pcap file and report on dns servers queried and their count
+  - read a pcap file and report on dns servers queried and their count
 * traffic-analysis.py
- - read a pcap file and report on dns queries slower than the specified time duration
- - writes total queries and slow queries found to files for review
- - imports cProfile module for deeper dive into script internals
+  - read a pcap file and report on dns queries slower than the specified time duration
+  - writes total queries and slow queries found to files for review
+  - imports cProfile module for deeper dive into script internals
 * dns-splitter.py
- - utilizes a query ID to seperate DNS queries from larger pcap into smaller pcap file for review
+  - utilizes a query ID to seperate DNS queries from larger pcap into smaller pcap file for review
 * dns-packet-parser.py
- - displays contents pcap DNS packets to stdout
+  - displays contents pcap DNS packets to stdout
 
 ## Requirements
  - [scapy] (https://scapy.net/)
