@@ -1,5 +1,5 @@
 # dns-traffic-analysis
-PCAP analysis tools to find DNS queries with high latency
+Tools for analyzing PCAP files to identify DNS queries with high latency.
 
 # Overview
 Clients frequently ask engineers to identify slow DNS queries in response to customer complaints about resolution issues. This often results in lengthy troubleshooting sessions using tools like tcpdump and Wireshark, along with extended customer interactions. The following tools can help streamline the investigation process and provide detailed reports directly from the CLI, reducing time spent on diagnostics.
