@@ -248,3 +248,6 @@ Type: CNAME Count: 15
 Type: TXT Count: 1
 Type: DS Count: 3
 ```
+
+
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
