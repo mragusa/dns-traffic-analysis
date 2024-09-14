@@ -2,7 +2,7 @@
 PCAP analysis tools to find DNS queries with high latency
 
 # Overview
-Often clients task engineers with determining what DNS queries are slow in an environment when a customer complains about resolution issues. This can often lead to long drawn out troubleshooting sessions involving tcpdump and wireshark coupled with long customer engagements. The following tools can be used to minimize investigation time and assist in reporting on details directly from the CLI
+Clients frequently ask engineers to identify slow DNS queries in response to customer complaints about resolution issues. This often results in lengthy troubleshooting sessions using tools like tcpdump and Wireshark, along with extended customer interactions. The following tools can help streamline the investigation process and provide detailed reports directly from the CLI, reducing time spent on diagnostics.
 
 * find-dns-server.py
   - read a pcap file and report on dns servers queried and their count
