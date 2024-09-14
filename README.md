@@ -16,6 +16,7 @@ Clients frequently ask engineers to identify slow DNS queries in response to cus
   - reads pcap file and displays DNS packet content to stdout
 
 ## Requirements
+ - Python 3.8 or higher.
  - [scapy](https://scapy.net/)
  - [tqdm](https://github.com/tqdm/tqdm)
 
