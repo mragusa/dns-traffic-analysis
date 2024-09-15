@@ -108,7 +108,7 @@ DNS Servers: 13.107.222.201 Count: 28
 
 ### dns-packet-parser.py
 ```
-./dns-packet-parser.py -h
+dns-packet-parser.py -h
 usage: dns-packet-parser.py [-h] -f FILE
 
 Read a pcap file and display DNS packet fields.
