@@ -74,6 +74,9 @@ def main(file, display, count, focus):
 
             if count:
                 c = 0
+                # adjust count if results are less than count
+                if len(type_choice[focus]) < count:
+                    count = len(type_choice[focus])
                 while c < count:
                     for n in type_choice[focus]:
                         print(
