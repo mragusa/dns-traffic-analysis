@@ -16,7 +16,7 @@ dns_clients = {}
 
 
 def find_dns_servers(packet):
-    if packet.haslayer("UDP"):
+    if "UDP" in packet:
         if packet["UDP"].dport == 53:
             if packet["IP"].dst in dns_servers_found:
                 dns_servers_found[packet["IP"].dst] += 1
@@ -27,17 +27,18 @@ def find_dns_servers(packet):
                 dns_clients[packet["IP"].dst] += 1
             else:
                 dns_clients[packet["IP"].dst] = 1
-                if packet["IP"].dst in dns_servers_found:
-                    if packet["IP"].dst in recursive_dns_servers:
-                        recursive_dns_servers[packet["IP"].dst] += 1
-                    else:
-                        recursive_dns_servers[packet["IP"].dst] = dns_servers_found[
-                            packet["IP"].dst
-                        ]
-            for r in recursive_dns_servers:
-                if r in dns_servers_found or r in dns_clients:
-                    dns_servers_found.pop(r, None)
-                    dns_clients.pop(r, None)
+
+    if "TCP" in packet:
+        if packet["TCP"].dport == 53:
+            if packet["IP"].dst in dns_servers_found:
+                dns_servers_found[packet["IP"].dst] += 1
+            else:
+                dns_servers_found[packet["IP"].dst] = 1
+        if packet["TCP"].sport == 53:
+            if packet["IP"].dst in dns_clients:
+                dns_clients[packet["IP"].dst] += 1
+            else:
+                dns_clients[packet["IP"].dst] = 1
 
 
 def main(file, display, count, focus):
@@ -46,6 +47,17 @@ def main(file, display, count, focus):
         packet_file = rdpcap(file)
         for packet in packet_file:
             find_dns_servers(packet)
+
+        # Find recursive DNS servers
+        for c in dns_clients:
+            if c in dns_servers_found:
+                query_count = dns_clients[c] + dns_servers_found[c]
+                recursive_dns_servers[c] = query_count
+        # Clean recursive servers from dns_servers and dns_clients
+        for r in recursive_dns_servers:
+            if r in dns_servers_found or r in dns_clients:
+                dns_servers_found.pop(r, None)
+                dns_clients.pop(r, None)
 
         if display:
             if focus == "servers":
@@ -71,7 +83,6 @@ def main(file, display, count, focus):
                     sorted(dns_clients.items(), key=lambda item: [1], reverse=True)
                 )
                 type_choice["clients"] = sorted_clients
-
             if count:
                 c = 0
                 # adjust count if results are less than count
