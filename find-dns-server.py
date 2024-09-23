@@ -122,7 +122,7 @@ def main(file, display, count, focus):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Parse pcap files to file DNS servers",
-        epilog="Utilize traffic_analysis script to parse pcap files for slow DNS queries",
+        epilog="Identify DNS servers and clients from a PCAP file",
     )
     parser.add_argument("-f", "--file", help="pcap source file to parse")
     parser.add_argument(
