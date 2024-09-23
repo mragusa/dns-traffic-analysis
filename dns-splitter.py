@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+# Disable warning messages on startup
+import logging
+
+logging.getLogger("scapy").setLevel(logging.CRITICAL)
+
 from scapy.all import *
 import argparse
 

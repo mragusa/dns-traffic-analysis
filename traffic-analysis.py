@@ -1,5 +1,10 @@
 #!/usr/bin/env python3 -O
 
+# Disable warning messages on startup
+import logging
+
+logging.getLogger("scapy").setLevel(logging.CRITICAL)
+
 from scapy.all import IP, UDP, DNS, DNSQR, DNSRR, PcapReader
 from tqdm import tqdm
 
