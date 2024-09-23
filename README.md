@@ -65,7 +65,7 @@ pip install -r requirements.txt
 ### find-dns-server.py
 ```
 find-dns-server.py -h
-usage: find-dns-server.py [-h] [-f FILE] [-p] [-d] [-c COUNT]
+usage: find_dns_server.py [-h] [-f FILE] [-p] [-d] [-c COUNT] [--focus {servers,recursive,clients}]
 
 Parse pcap files to file DNS servers
 
@@ -76,8 +76,10 @@ options:
   -d, --display         display dns servers found
   -c COUNT, --count COUNT
                         display x amount of dns servers
+  --focus {servers,recursive,clients}
+                        Specify traffic to display
 
-Utilize traffic_analysis script to parse pcap files for slow DNS queries
+Identify DNS servers and clients from a PCAP file
 ```
 #### Example
 ##### Find count of total DNS servers found
@@ -86,11 +88,13 @@ find-dns-server.py -f small_slow_packets
 ```
 ##### Output
 ```
-Total DNS servers found: 688
+Total DNS servers found: 686
+Total recursive DNS servers found: 3
+Total DNS clients found: 2022
 ```
 ##### Display DNS servers found
 ```
-find-dns-server.py -f small_slow_packets -d -c 10
+find-dns-server.py -f small_slow_packets -d --focus servers -c 10
 ```
 ##### Output
 ```
