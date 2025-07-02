@@ -1,16 +1,14 @@
 #!/usr/bin/env python3 -O
 
-# Disable warning messages on startup
-import logging
-
-logging.getLogger("scapy").setLevel(logging.CRITICAL)
-
-from scapy.all import IP, UDP, DNS, DNSQR, DNSRR, PcapReader
-from tqdm import tqdm
-
 import argparse
 import statistics
 import cProfile
+from tqdm import tqdm
+import logging
+
+# Disable warning messages on startup
+logging.getLogger("scapy").setLevel(logging.ERROR)
+from scapy.all import IP, IPv6, UDP, DNS, DNSQR, DNSRR, PcapReader
 
 
 class DnsAnalyzer:
@@ -130,14 +128,29 @@ class DnsAnalyzer:
         if self.verbose:
             print(packet)
         if DNS in packet and (
-            packet[IP].dst == self.source_ip or packet[IP].src == self.source_ip
+            (
+                IP in packet
+                and (
+                    packet[IP].dst == self.source_ip or packet[IP].src == self.source_ip
+                )
+            )
+            or (
+                IPv6 in packet
+                and (
+                    packet[IPv6].dst == self.source_ip
+                    or packet[IPv6].src == self.source_ip
+                )
+            )
         ):
             dns = packet.getlayer(DNS)
             if self.verbose:
                 print(dns)  # Corrected indentation
             if dns is not None:
                 if DNSQR in dns:
-                    if packet[IP].dst == self.source_ip:
+                    if (
+                        packet[IP].dst == self.source_ip
+                        or packet[IPv6].dst == self.source_ip
+                    ):
                         self.queries_received.append(
                             {
                                 "query_id": dns.id,
@@ -156,7 +169,10 @@ class DnsAnalyzer:
                         else:
                             self.recordname[dns.qd.qname] += 1
                             self.recordname_id[dns.qd.qname].append(dns.id)
-                    if packet[IP].src == self.source_ip:
+                    if (
+                        packet[IP].src == self.source_ip
+                        or packet[IPv6].src == self.source_ip
+                    ):
                         if isinstance(dns.an, DNSRR):
                             response_name = dns.an.rrname
                             self.responses_sent.append(
