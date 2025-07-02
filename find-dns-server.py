@@ -63,7 +63,7 @@ def find_dns_servers(packet):
                 dns_clients[packet[IPv6].dst] = 1
 
 
-def main(file, display, count, focus):
+def main(file: str, display: bool, count: int, focus: list):
     type_choice = {}
     if file:
         packet_file = rdpcap(file)
