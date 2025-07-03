@@ -147,9 +147,8 @@ class DnsAnalyzer:
                 print(dns)  # Corrected indentation
             if dns is not None:
                 if DNSQR in dns:
-                    if (
-                        packet[IP].dst == self.source_ip
-                        or packet[IPv6].dst == self.source_ip
+                    if (IP in packet and (packet[IP].dst == self.source_ip)) or (
+                        IPv6 in packet and (packet[IPv6].dst == self.source_ip)
                     ):
                         self.queries_received.append(
                             {
@@ -169,9 +168,8 @@ class DnsAnalyzer:
                         else:
                             self.recordname[dns.qd.qname] += 1
                             self.recordname_id[dns.qd.qname].append(dns.id)
-                    if (
-                        packet[IP].src == self.source_ip
-                        or packet[IPv6].src == self.source_ip
+                    if (IP in packet and (packet[IP].src == self.source_ip)) or (
+                        IPv6 in packet and (packet[IPv6].src == self.source_ip)
                     ):
                         if isinstance(dns.an, DNSRR):
                             response_name = dns.an.rrname
