@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# TODO
+# Add client query output file
+# Add server query output file
+# Add % of success vs failures
 
 import click
 from tqdm import tqdm
@@ -20,7 +24,25 @@ query_types = defaultdict(int)
 op_codes = defaultdict(int)
 notify_traffic = defaultdict(int)
 # Op Code definitions
-op_code_def = {0: "Query", 2: "Status", 4: "Notify", 5: "Update"}
+op_code_def = {0: "Query", 2: "Status", 4: "Notify", 5: "Update", 8: "NXDOMAIN"}
+# Extended DNS RCodes
+# https://developers.cloudflare.com/1.1.1.1/infrastructure/extended-dns-error-codes/
+extended_rcodes = {
+    1: "Unsupported DNSKEY Algorithm",
+    2: "Unsupported DS Digest Type",
+    3: "Stale Answer",
+    6: "DNSSEC Bogus",
+    7: "Signature Expired",
+    8: "Signature Not Yet Valid",
+    9: "DNSSEC Key Missing",
+    10: "RRSIGs Missing",
+    11: "No Zone Key Bit Set",
+    12: "NSEC Missing",
+    13: "Cached Error",
+    22: "No Reachable Authority",
+    23: "Network Error",
+    30: "Invalid Query Type",
+}
 # DNS query type definitions
 record_type_lookup = {
     1: "A",
@@ -110,15 +132,28 @@ record_type_lookup = {
     59: "CDS",
     37: "CERT",
     5: "CNAME",
+    4880: "OPENPGPKEY",
+    704: "UNKNOWN-704",
+    705: "MALFORMED",
+    706: "DNSAPI",
+    707: "ZONE EXISTS",
+    3081: "UNKNOWN-3081",
+    4109: "A6",
+    3852: "UNKNOWN-3852",
+    8482: "ANY-CLOUDFLARE",
 }
 
 
 @click.command()
 @click.option("-f", "--file", help="Packet Capture File")
 @click.option("-v", "--verbose", is_flag=True, help="Verbose output for debugging")
-@click.option("-c", "--clients", is_flag=True, help="Display Client Data")
-@click.option("-s", "--servers", is_flag=True, help="Display Server Data")
-@click.option("-r", "--report", is_flag=True, help="Summary Report")
+@click.option(
+    "-c", "--clients", is_flag=True, default=False, help="Display Client Data"
+)
+@click.option(
+    "-s", "--servers", is_flag=True, default=False, help="Display Server Data"
+)
+@click.option("-r", "--report", is_flag=True, default=False, help="Summary Report")
 def main(
     file: str,
     verbose: bool,
@@ -148,7 +183,7 @@ def main(
             for q in dns_clients[c]:
                 print(c, q, dns_clients[c][q])
     if servers:
-        for s in sorted(dns_servers):
+        for s in sorted(dns_servers, key=lambda x: str(x)):
             for q in dns_servers[s]:
                 for v in dns_servers[s][q]:
                     print(s, q, v, dns_servers[s][q][v])
@@ -272,7 +307,7 @@ def process_packet(packet, verbose: bool):
             if dns.an:
                 op_codes[packet[DNS].opcode] += 1
                 if packet[DNS].opcode == 4:
-                    notify_traffic[packet[IP].dst, "-", packet[IP].src] += 1
+                    notify_traffic[packet[IP].src, "-", packet[IP].dst] += 1
                 query_types[packet[DNS].qd.qtype] += 1
                 network_vlan[packet[Dot1Q].vlan] += 1
                 dns_servers[packet[IP].src][
@@ -295,7 +330,7 @@ def process_packet(packet, verbose: bool):
             if dns.an:
                 op_codes[packet[DNS].opcode] += 1
                 if packet[DNS].opcode == 4:
-                    notify_traffic[packet[IP].dst, "-", packet[IP].src] += 1
+                    notify_traffic[packet[IP].src, "-", packet[IP].dst] += 1
                 query_types[packet[DNS].qd.qtype] += 1
                 dns_servers[packet[IP].src][
                     dns.qd.qname.decode("utf-8", errors="replace")
@@ -322,7 +357,7 @@ def process_packet(packet, verbose: bool):
             if dns.an:
                 op_codes[packet[DNS].opcode] += 1
                 if packet[DNS].opcode == 4:
-                    notify_traffic[packet[IP].dst, "-", packet[IP].src] += 1
+                    notify_traffic[packet[IP].src, "-", packet[IP].dst] += 1
                 query_types[packet[DNS].qd.qtype] += 1
                 network_vlan[packet[Dot1Q].vlan] += 1
                 dns_servers[packet[IPv6].src][
@@ -346,7 +381,7 @@ def process_packet(packet, verbose: bool):
             if dns.an:
                 op_codes[packet[DNS].opcode] += 1
                 if packet[DNS].opcode == 4:
-                    notify_traffic[packet[IP].dst, "-", packet[IP].src] += 1
+                    notify_traffic[packet[IP].src, "-", packet[IP].dst] += 1
                 query_types[packet[DNS].qd.qtype] += 1
                 dns_servers[packet[IPv6].src][
                     dns.qd.qname.decode("utf-8", errors="replace")
@@ -378,7 +413,10 @@ def display_report(report_name: str, data: dict):
         table.add_column("RCode", justify="center")
         table.add_column("Count", justify="center")
         for r in data:
-            table.add_row(r, str(data[r]))
+            if r in extended_rcodes:
+                table.add_row(extended_rcodes[r], str(data[r]))
+            else:
+                table.add_row(r, str(data[r]))
         console = Console()
         console.print(table)
     if report_name == "DNS Notifies":
