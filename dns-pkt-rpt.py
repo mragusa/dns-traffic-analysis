@@ -14,7 +14,21 @@ from collections import defaultdict
 import logging
 
 logging.getLogger("scapy").setLevel(logging.ERROR)
-from scapy.all import PcapReader, IP, IPv6, TCP, UDP, Dot1Q, DNS, DNSQR, DNSRR
+from scapy.all import (
+    PcapReader,
+    IP,
+    IPv6,
+    TCP,
+    UDP,
+    Dot1Q,
+    DNS,
+    DNSQR,
+    DNSRR,
+    UDPerror,
+    TCPerror,
+    ICMP,
+    IPerror,
+)
 
 dns_clients = defaultdict(lambda: defaultdict(int))
 dns_servers = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
@@ -23,6 +37,94 @@ success_rate = defaultdict(int)
 query_types = defaultdict(int)
 op_codes = defaultdict(int)
 notify_traffic = defaultdict(int)
+icmp_client_errors = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
+dns_client_icmp = []
+# ICMP Information
+icmp_type = {
+    0: {0: "Echo Reply"},
+    1: "Unassigned",
+    2: "Unassigned",
+    3: {
+        0: "Destination network unreachable",
+        1: "Destination host unreachable",
+        2: "Destination protocol unreachable",
+        3: "Destination port unreachable",
+        4: "Fragmentation required, and DF flag set",
+        5: "Source route failed",
+        6: "Destination network unknown",
+        7: "Destination host unknown",
+        8: "Source host isolated",
+        9: "Network administratively prohibited",
+        10: "Host administratively prohibited",
+        11: "Network unreachable for ToS",
+        12: "Host unreachable for ToS",
+        13: "Communication administratively prohibited",
+        14: "Host Precedence Violation",
+        15: "Precedence cutoff in effect",
+    },
+    4: {0: "Source quench (congestion control)"},
+    5: {
+        0: "Redirect Datagram for the Network",
+        1: "Redirect Datagram for the Host",
+        2: "Redirect Datagram for the ToS & network",
+        3: "Redirect Datagram for the ToS & host",
+    },
+    6: "Alternate Host Address",
+    7: "Unassigned",
+    8: {0: "Echo Request"},
+    9: {0: "Router Advertisement"},
+    10: {0: "Router discovery/selection/solicitation"},
+    11: {
+        0: "Time to live (TTL) expired in transit",
+        1: "Fragment reassembly time exceeded",
+    },
+    12: {
+        0: "Pointer indicates the error",
+        1: "Missing a required option",
+        2: "Bad length",
+    },
+    13: {0: "Timestamp"},
+    14: {0: "Timestamp reply"},
+    15: {0: "Information Request"},
+    16: {0: "Information Reply"},
+    17: {0: "Address Mask Request"},
+    18: {0: "Address Mask Reply"},
+    19: "Reserved for security",
+    20: "Reserved for robustness experiment",
+    21: "Reserved for robustness experiment",
+    22: "Reserved for robustness experiment",
+    23: "Reserved for robustness experiment",
+    24: "Reserved for robustness experiment",
+    25: "Reserved for robustness experiment",
+    26: "Reserved for robustness experiment",
+    27: "Reserved for robustness experiment",
+    28: "Reserved for robustness experiment",
+    29: "Reserved for robustness experiment",
+    30: {0: "Information Request"},
+    31: "Datagram Conversion Error",
+    32: "Mobile Host Redirect",
+    33: "Where-Are-You (originally meant for IPv6)",
+    34: "Here-I-Am (originally meant for IPv6)",
+    35: "Mobile Registration Request",
+    36: "Mobile Registration Reply",
+    37: "Domain Name Request",
+    38: "Domain Name Reply",
+    39: "SKIP Algorithm Discovery Protocol, Simple Key-Management for Internet Protocol",
+    40: "Photuris, Security failures",
+    41: "ICMP for experimental mobility protocols such as Seamoby",
+    42: {0: "Request Extended Echo"},
+    43: {
+        0: "No Error",
+        1: "Malformed Query",
+        2: "No Such Interface",
+        3: "No Such Table Entry",
+        4: "Multiple Interfaces Satisfy Query",
+    },
+    44: "Reserved",
+    253: "RFC3692-style Experiment 1",
+    254: "RFC3692-style Experiment 2",
+    255: "Reserved",
+}
 # Op Code definitions
 op_code_def = {0: "Query", 2: "Status", 4: "Notify", 5: "Update", 8: "NXDOMAIN"}
 # Extended DNS RCodes
@@ -199,6 +301,10 @@ def main(
             display_report("VLANs", network_vlan)
         else:
             print("No VLANs detected in this capture")
+        if icmp_client_errors:
+            display_report("ICMP Errors", icmp_client_errors)
+        else:
+            print("Review Debug Output")
 
 
 def process_packet(packet, verbose: bool):
@@ -391,6 +497,15 @@ def process_packet(packet, verbose: bool):
                 ] += 1
         else:
             print("Unconsidered: {}".format(packet))
+    if ICMP in packet:
+        if (UDPerror in packet and packet[UDPerror].sport == 53) or (
+            TCPerror in packet and packet[TCPerror].sport == 53
+        ):
+            if packet[ICMP].code:
+                icmp_code = icmp_type[packet[ICMP].type][packet[ICMP].code]
+            else:
+                icmp_code = icmp_type[packet[ICMP].code]
+            icmp_client_errors[packet[IPerror].src][packet[IPerror].dst][icmp_code] += 1
 
 
 def display_report(report_name: str, data: dict):
@@ -400,15 +515,11 @@ def display_report(report_name: str, data: dict):
         table.add_column("Count", justify="center")
         for qt in data:
             table.add_row(record_type_lookup[qt], str(data[qt]))
-        console = Console()
-        console.print(table)
     if report_name == "Op Codes":
         table.add_column("Code", justify="center")
         table.add_column("Count", justify="center")
         for oc in data:
             table.add_row(op_code_def[oc], str(data[oc]))
-        console = Console()
-        console.print(table)
     if report_name == "Success Rates":
         table.add_column("RCode", justify="center")
         table.add_column("Count", justify="center")
@@ -417,23 +528,29 @@ def display_report(report_name: str, data: dict):
                 table.add_row(extended_rcodes[r], str(data[r]))
             else:
                 table.add_row(r, str(data[r]))
-        console = Console()
-        console.print(table)
     if report_name == "DNS Notifies":
         table.add_column("SRC", justify="center")
         table.add_column("DST", justify="center")
         table.add_column("Count", justify="center")
         for n in data:
             table.add_row(n[0], n[2], str(data[n]))
-        console = Console()
-        console.print(table)
+    if report_name == "ICMP Errors":
+        table.add_column("SRC", justify="center")
+        table.add_column("DST", justify="center")
+        table.add_column("Description", justify="center")
+        table.add_column("Count", justify="center")
+        for s in icmp_client_errors:
+            if s in dns_clients.keys():
+                for d in icmp_client_errors[s]:
+                    for c in icmp_client_errors[s][d]:
+                        table.add_row(s, d, c, str(icmp_client_errors[s][d][c]))
     if report_name == "VLANs":
         table.add_column("VLAN", justify="center")
         table.add_column("Count", justify="center")
         for v in data:
             table.add_row(str(v), str(data[v]))
-        console = Console()
-        console.print(table)
+    console = Console()
+    console.print(table)
 
 
 if __name__ == "__main__":
