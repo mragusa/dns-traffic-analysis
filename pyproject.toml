@@ -58,7 +58,6 @@ dependencies = [
     "zstandard (==0.25.0)"
 ]
 
-keywords = ["dns", "pcap", "troubleshooting", "diagnostic", "network"]
 
 [project.urls]
 "homepage" = "https://github.com/mragusa/dns-traffic-analysis"
@@ -73,3 +72,5 @@ venv = "venv"
 
 [tool.poetry]
 package-mode = true
+keywords = ["dns", "pcap", "troubleshooting", "diagnostic", "network"]
+repository = "https://github.com/mragusa/dns-traffic-analysis"
