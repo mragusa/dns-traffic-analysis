@@ -126,7 +126,10 @@ def main(file: str, display: bool, count: int, focus: list):
                             "{}: {} Count: {}".format(focus, n, type_choice[focus][n])
                         )
                 else:
-                    print("No sorted data found")
+                    if focus:
+                        print("No {} data found".format(focus))
+                    else:
+                        print("Please pick data focus to display")
         else:
             print("Total DNS servers found: {}".format(len(dns_servers_found)))
             print(
