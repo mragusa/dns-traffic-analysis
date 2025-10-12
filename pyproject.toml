@@ -55,7 +55,9 @@ dependencies = [
     "urllib3 (==2.5.0)",
     "virtualenv (==20.34.0)",
     "xattr (==1.2.0)",
-    "zstandard (==0.25.0)"
+    "zstandard (==0.25.0)",
+    "click (>=8.3.0,<9.0.0)",
+    "rich (>=14.2.0,<15.0.0)"
 ]
 
 
