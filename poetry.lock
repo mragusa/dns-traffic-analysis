@@ -2,23 +2,22 @@
 
 [[package]]
 name = "anyio"
-version = "4.11.0"
+version = "4.12.0"
 description = "High-level concurrency and networking framework on top of asyncio or Trio"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "anyio-4.11.0-py3-none-any.whl", hash = "sha256:0287e96f4d26d4149305414d4e3bc32f0dcd0862365a4bddea19d7a1ec38c4fc"},
-    {file = "anyio-4.11.0.tar.gz", hash = "sha256:82a8d0b81e318cc5ce71a5f1f8b5c4e63619620b63141ef8c995fa0db95a57c4"},
+    {file = "anyio-4.12.0-py3-none-any.whl", hash = "sha256:dad2376a628f98eeca4881fc56cd06affd18f659b17a747d3ff0307ced94b1bb"},
+    {file = "anyio-4.12.0.tar.gz", hash = "sha256:73c693b567b0c55130c104d0b43a9baf3aa6a31fc6110116509f27bf75e21ec0"},
 ]
 
 [package.dependencies]
 idna = ">=2.8"
-sniffio = ">=1.1"
 typing_extensions = {version = ">=4.5", markers = "python_version < \"3.13\""}
 
 [package.extras]
-trio = ["trio (>=0.31.0)"]
+trio = ["trio (>=0.31.0) ; python_version < \"3.10\"", "trio (>=0.32.0) ; python_version >= \"3.10\""]
 
 [[package]]
 name = "build"
@@ -65,14 +64,14 @@ redis = ["redis (>=2.10.5)"]
 
 [[package]]
 name = "certifi"
-version = "2025.10.5"
+version = "2025.11.12"
 description = "Python package for providing Mozilla's CA Bundle."
 optional = false
 python-versions = ">=3.7"
 groups = ["main"]
 files = [
-    {file = "certifi-2025.10.5-py3-none-any.whl", hash = "sha256:0f212c2744a9bb6de0c56639a6f68afe01ecd92d91f14ae897c4fe7bbeeef0de"},
-    {file = "certifi-2025.10.5.tar.gz", hash = "sha256:47c09d31ccf2acf0be3f701ea53595ee7e0b8fa08801c6624be771df09ae7b43"},
+    {file = "certifi-2025.11.12-py3-none-any.whl", hash = "sha256:97de8790030bbd5c2d96b7ec782fc2f7820ef8dba6db909ccf95449f2d062d4b"},
+    {file = "certifi-2025.11.12.tar.gz", hash = "sha256:d8ab5478f2ecd78af242878415affce761ca6bc54a22a27e026d7c25357c3316"},
 ]
 
 [[package]]
@@ -313,14 +312,14 @@ rapidfuzz = ">=3.0.0,<4.0.0"
 
 [[package]]
 name = "click"
-version = "8.3.0"
+version = "8.3.1"
 description = "Composable command line interface toolkit"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "click-8.3.0-py3-none-any.whl", hash = "sha256:9b9f285302c6e3064f4330c05f05b81945b2a39544279343e6e7c5f27a9baddc"},
-    {file = "click-8.3.0.tar.gz", hash = "sha256:e7b8232224eba16f4ebe410c25ced9f7875cb5f3263ffc93cc3e8da705e229c4"},
+    {file = "click-8.3.1-py3-none-any.whl", hash = "sha256:981153a64e25f12d547d3426c367a4857371575ee7ad18df2a6183ab0545b2a6"},
+    {file = "click-8.3.1.tar.gz", hash = "sha256:12ff4785d337a1bb490bb7e9c2b1ee5da3112e94a8622f26a6c77f5d2fc6842a"},
 ]
 
 [package.dependencies]
@@ -443,43 +442,43 @@ files = [
 
 [[package]]
 name = "dulwich"
-version = "0.24.7"
+version = "0.24.10"
 description = "Python Git Library"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "dulwich-0.24.7-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:d55ccb9b89c00334a372bd1a8ac8203669251af0d1747dff36730eca617f941f"},
-    {file = "dulwich-0.24.7-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:03baba91e4c143e8cacf1e55c91061a401a266de4ced5904909825a934b43cbb"},
-    {file = "dulwich-0.24.7-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:1476379539c60a689ccfefbde3ec3b5e584cd6fc8669de89e69c4ea6a404520f"},
-    {file = "dulwich-0.24.7-cp310-cp310-win32.whl", hash = "sha256:e3675065022ec06a9ddc339e317900a1b4e6cc020516704e7c58eb3ba990458a"},
-    {file = "dulwich-0.24.7-cp310-cp310-win_amd64.whl", hash = "sha256:7c9f59c4089667f64e9f6c3711a444067882f1ae3d27e6475acf2c12ec9aeadc"},
-    {file = "dulwich-0.24.7-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:381baadd6b4af9264586b91fe09260ccf790b08dae5ef688645503c199094c7a"},
-    {file = "dulwich-0.24.7-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:f88c2e7f6c369f2d988e14b76d2228a48d3aea475e7ff13ceb156edb3a18b2f9"},
-    {file = "dulwich-0.24.7-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:bb12ace558b3f4ba37bbd069d0f6bd4add7416693a3bc95e3286c5acff0c05a1"},
-    {file = "dulwich-0.24.7-cp311-cp311-win32.whl", hash = "sha256:ae60eec025625e65f7caf37a69076b12cdb4b63ddb317990ff0cb817c8132988"},
-    {file = "dulwich-0.24.7-cp311-cp311-win_amd64.whl", hash = "sha256:d328200d3caa20557e0568e8dd6c46714406b45abd4e0b333eeb5436614e4f3c"},
-    {file = "dulwich-0.24.7-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:5cb46d76558147529d8de295f8ca22bce0a4cb62163f708c54fc92f2a8d8728f"},
-    {file = "dulwich-0.24.7-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:ba0a121b148dffa5cc3d5fdceb32a002cb6b75a6b79abd89750584baa5021c0b"},
-    {file = "dulwich-0.24.7-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:23182ca6bd54b74109c2fb2bb70b6c34e7dc3bbcc08ecb5c6c31a3a4aa1b30c3"},
-    {file = "dulwich-0.24.7-cp312-cp312-win32.whl", hash = "sha256:1c154a8f33acd815ad990e85d230497de892dde2476e35370f5762d34a1f70fa"},
-    {file = "dulwich-0.24.7-cp312-cp312-win_amd64.whl", hash = "sha256:19f7a90377f5814716beaaeec34897d181c200a666baf477650e0cd4c699443f"},
-    {file = "dulwich-0.24.7-cp313-cp313-android_21_arm64_v8a.whl", hash = "sha256:461f2a894e1045fc6faad1ca0123aac87554f5dd40cbb5772e35933f1f6f1e32"},
-    {file = "dulwich-0.24.7-cp313-cp313-android_21_x86_64.whl", hash = "sha256:c8f44cb89d85fe40fa91ec34190d70a016be917ee841591fdbe9fd7e0ff61fc2"},
-    {file = "dulwich-0.24.7-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:06219dd38d553f18184dc885fbabe27d3d344ab0327d4ab3f1606617c09d8b32"},
-    {file = "dulwich-0.24.7-cp313-cp313-manylinux_2_28_aarch64.whl", hash = "sha256:3eb5af24dd2c760701f4b7780b1a9fb5a0da731053fe5d1d0a2f92daa4c62240"},
-    {file = "dulwich-0.24.7-cp313-cp313-manylinux_2_28_x86_64.whl", hash = "sha256:d8c42e45c217506759170b01b09e194acce1463aafd61f71fb7094b192ad09aa"},
-    {file = "dulwich-0.24.7-cp313-cp313-win32.whl", hash = "sha256:32e7e18edfad5dfb978ccf8e575b5776234110b722ea677d4e843058a1df1dd0"},
-    {file = "dulwich-0.24.7-cp313-cp313-win_amd64.whl", hash = "sha256:265549c96680be1f6322cfeabb41337714c1a128824ab7e06d8c9d8a2640f4fb"},
-    {file = "dulwich-0.24.7-cp314-cp314-android_24_arm64_v8a.whl", hash = "sha256:d29784211e7aeb84ddca1265fe7b8356556f8da531432b542084fb70e8341a00"},
-    {file = "dulwich-0.24.7-cp314-cp314-android_24_x86_64.whl", hash = "sha256:4bb0673480005c7aa331b05af77795f2612e5155fbecaaa0c3fd9da665dad420"},
-    {file = "dulwich-0.24.7-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:0ad2b37d65f1f97f9635febf43cf5ecc643900c18463e3dbe43538076c9778bf"},
-    {file = "dulwich-0.24.7-cp39-cp39-manylinux_2_28_aarch64.whl", hash = "sha256:f48a06d635b061f1196e63e91046e9b8ba9c9865fa8ac1ec7b21580538c9ef0c"},
-    {file = "dulwich-0.24.7-cp39-cp39-manylinux_2_28_x86_64.whl", hash = "sha256:9fe8e6c075fe9de2532ee176145172fcb52529b9fbe63708392ddca9c185cf91"},
-    {file = "dulwich-0.24.7-cp39-cp39-win32.whl", hash = "sha256:c7143322dbbeaf78a8a8a433a13f62b51def640b699426c64643f58bf80dfbee"},
-    {file = "dulwich-0.24.7-cp39-cp39-win_amd64.whl", hash = "sha256:8f86d5da9dd29ee20f3b5e4aa18a088707e5a05413ae29cf67d7d7474b88de99"},
-    {file = "dulwich-0.24.7-py3-none-any.whl", hash = "sha256:c1d6e35d7c41982d4ba375ce8ba9db783f4b4ca1a00c62f3121eb881f5c03c53"},
-    {file = "dulwich-0.24.7.tar.gz", hash = "sha256:f10bffa1395a8dedc3d38ac05164f761ae838a6a18f9a09a966f27dd651850d4"},
+    {file = "dulwich-0.24.10-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:1f511f7afe1f36e37193214e4e069685d7d0378e756cc96a2fcb138bdf9fefca"},
+    {file = "dulwich-0.24.10-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:2a56f9838e5d2414a2b57bab370b73b9803fefd98836ef841f0fd489b5cc1349"},
+    {file = "dulwich-0.24.10-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:90b24c0827299cfb53c4f4d4fedc811be5c4b10c11172ff6e5a5c52277fe0b3a"},
+    {file = "dulwich-0.24.10-cp310-cp310-win32.whl", hash = "sha256:0dfae8c59b97964a907fdf4c5809154a18fd8c55f2eb6d8fd1607464165a9aa2"},
+    {file = "dulwich-0.24.10-cp310-cp310-win_amd64.whl", hash = "sha256:0e1601789554e3d15b294356c78a5403521c27d5460e64dbbc44ffd5b10af4c3"},
+    {file = "dulwich-0.24.10-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:fbf94fa73211d2f029751a72e1ca3a2fd35c6f5d9bb434acdf10a4a79ca322dd"},
+    {file = "dulwich-0.24.10-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:b715a9f85ed71bef8027275c1bded064e4925071ae8c8a8d9a20c67b31faf3cd"},
+    {file = "dulwich-0.24.10-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:858fae0c7121715282a993abb1919385a28e1a9c4f136f568748d283c2ba874f"},
+    {file = "dulwich-0.24.10-cp311-cp311-win32.whl", hash = "sha256:393e9c3cdd382cff20b5beb66989376d6da69e3b0dfec046a884707ab5d27ac9"},
+    {file = "dulwich-0.24.10-cp311-cp311-win_amd64.whl", hash = "sha256:470d6cd8207e1a5ff1fb34c4c6fac2ec9a96d618f7062e5fb96c5260927bb9a7"},
+    {file = "dulwich-0.24.10-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:5c724e5fc67c45f3c813f2630795ac388e3e6310534212f799a7a6bf230648c8"},
+    {file = "dulwich-0.24.10-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:6a25ca1605a94090514af408f9df64427281aefbb726f542e97d86d3a7c8ec18"},
+    {file = "dulwich-0.24.10-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:d9793fc1e42149a650a017dc8ce38485368a41729b9937e1dfcfedd0591ebe9d"},
+    {file = "dulwich-0.24.10-cp312-cp312-win32.whl", hash = "sha256:1601bfea3906b52c924fae5b6ba32a0b087fb8fae927607e6b5381e6f7559611"},
+    {file = "dulwich-0.24.10-cp312-cp312-win_amd64.whl", hash = "sha256:f7bfa9f0bfae57685754b163eef6641609047460939d28052e3beeb63efa6795"},
+    {file = "dulwich-0.24.10-cp313-cp313-android_21_arm64_v8a.whl", hash = "sha256:843de5f678436a27b33aea0f2b87fd0453afdd0135f885a3ca44bc3147846dd2"},
+    {file = "dulwich-0.24.10-cp313-cp313-android_21_x86_64.whl", hash = "sha256:4914abb6408a719b7a1f7d9a182d1efd92c326e178b440faf582df50f9f032db"},
+    {file = "dulwich-0.24.10-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:ce6e05ec50f258ccd14d83114eb32cc5bb241ae4a8c7199d014fd7568de285b1"},
+    {file = "dulwich-0.24.10-cp313-cp313-manylinux_2_28_aarch64.whl", hash = "sha256:3581ae0af33f28e6c0834d2f41ca67ca81cd92a589e6a5f985e6c64373232958"},
+    {file = "dulwich-0.24.10-cp313-cp313-manylinux_2_28_x86_64.whl", hash = "sha256:019af16c850ae85254289f9633a29dea02f45351c4182ea20b0c1394c074a13b"},
+    {file = "dulwich-0.24.10-cp313-cp313-win32.whl", hash = "sha256:4b5c225477a529e1d4a2b5e51272a418177e34803938391ce41b7573b2e5b0d0"},
+    {file = "dulwich-0.24.10-cp313-cp313-win_amd64.whl", hash = "sha256:752c32d517dc608dbb8414061eaaec8ac8a05591b29531f81a83336b018b26c6"},
+    {file = "dulwich-0.24.10-cp314-cp314-android_24_arm64_v8a.whl", hash = "sha256:44f62e0244531a8c43ca7771e201ec9e7f6a2fb27f8c3c623939bc03c1f50423"},
+    {file = "dulwich-0.24.10-cp314-cp314-android_24_x86_64.whl", hash = "sha256:e2eda4a634d6f1ac4c0d4786f8772495c8840dfc2b3e595507376bf5e5b0f9c5"},
+    {file = "dulwich-0.24.10-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:1b19af8a3ab051003ba05f15fc5c0d6f0d427e795639490790f34ec0558e99e3"},
+    {file = "dulwich-0.24.10-cp39-cp39-manylinux_2_28_aarch64.whl", hash = "sha256:90028182b9a47ea4efed51c81298f3a98e279d7bf5c1f91c47101927a309ee45"},
+    {file = "dulwich-0.24.10-cp39-cp39-manylinux_2_28_x86_64.whl", hash = "sha256:8df79c8080471f363e4dfcfc4e0d2e61e6da73af1fd7d31cb6ae0d34af45a6b4"},
+    {file = "dulwich-0.24.10-cp39-cp39-win32.whl", hash = "sha256:f102c38207540fa485e85e0b763ce3725a2d49d846dbf316ed271e27fd85ff21"},
+    {file = "dulwich-0.24.10-cp39-cp39-win_amd64.whl", hash = "sha256:c262ffc94338999e7808b434dccafaccd572d03b42d4ef140059d4b7cad765a3"},
+    {file = "dulwich-0.24.10-py3-none-any.whl", hash = "sha256:15b32f8c3116a1c0a042dde8da96f65a607e263e860ee42b3d4a98ce2c2f4a06"},
+    {file = "dulwich-0.24.10.tar.gz", hash = "sha256:30e028979b6fa7220c913da9c786026611c10746c06496149742602b36a11f6b"},
 ]
 
 [package.dependencies]
@@ -863,14 +862,14 @@ files = [
 
 [[package]]
 name = "pbs-installer"
-version = "2025.10.28"
+version = "2025.12.5"
 description = "Installer for Python Build Standalone"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "pbs_installer-2025.10.28-py3-none-any.whl", hash = "sha256:329b0800df9ff8d50c79bfead69b0e05fa5c81d31e7e77377d1c422f94407eda"},
-    {file = "pbs_installer-2025.10.28.tar.gz", hash = "sha256:399f1788b17c650e69c42729ba9e74d240909f36cfe187b5f9b60488314ba154"},
+    {file = "pbs_installer-2025.12.5-py3-none-any.whl", hash = "sha256:1cc1977bbb8367bb3ce03a7954f58d6e765e184fd873b73674076f9e8788cd08"},
+    {file = "pbs_installer-2025.12.5.tar.gz", hash = "sha256:3d03347d73f4a58ddfbe26473b622065476633e57de44fb025527c8852e4efa7"},
 ]
 
 [package.dependencies]
@@ -911,14 +910,14 @@ testing = ["pytest", "pytest-cov", "wheel"]
 
 [[package]]
 name = "platformdirs"
-version = "4.5.0"
+version = "4.5.1"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "platformdirs-4.5.0-py3-none-any.whl", hash = "sha256:e578a81bb873cbb89a41fcc904c7ef523cc18284b7e3b3ccf06aca1403b7ebd3"},
-    {file = "platformdirs-4.5.0.tar.gz", hash = "sha256:70ddccdd7c99fc5942e9fc25636a8b34d04c24b335100223152c2803e4063312"},
+    {file = "platformdirs-4.5.1-py3-none-any.whl", hash = "sha256:d03afa3963c806a9bed9d5125c8f4cb2fdaf74a55ab60e5d59b3fde758104d31"},
+    {file = "platformdirs-4.5.1.tar.gz", hash = "sha256:61d5cdcc6065745cdd94f0f878977f8de9437be93de97c1c12f853c9c0cdcbda"},
 ]
 
 [package.extras]
@@ -1205,15 +1204,15 @@ doc = ["sphinx (>=7.0.0)", "sphinx-rtd-theme (>=1.3.0)", "tox (>=3.0.0)"]
 
 [[package]]
 name = "secretstorage"
-version = "3.4.0"
+version = "3.5.0"
 description = "Python bindings to FreeDesktop.org Secret Service API"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 markers = "sys_platform == \"linux\""
 files = [
-    {file = "secretstorage-3.4.0-py3-none-any.whl", hash = "sha256:0e3b6265c2c63509fb7415717607e4b2c9ab767b7f344a57473b779ca13bd02e"},
-    {file = "secretstorage-3.4.0.tar.gz", hash = "sha256:c46e216d6815aff8a8a18706a2fbfd8d53fcbb0dce99301881687a1b0289ef7c"},
+    {file = "secretstorage-3.5.0-py3-none-any.whl", hash = "sha256:0ce65888c0725fcb2c5bc0fdb8e5438eece02c523557ea40ce0703c266248137"},
+    {file = "secretstorage-3.5.0.tar.gz", hash = "sha256:f04b8e4689cbce351744d5537bf6b1329c6fc68f91fa666f60a380edddcd11be"},
 ]
 
 [package.dependencies]
@@ -1343,14 +1342,14 @@ zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
 name = "virtualenv"
-version = "20.35.3"
+version = "20.35.4"
 description = "Virtual Python Environment builder"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "virtualenv-20.35.3-py3-none-any.whl", hash = "sha256:63d106565078d8c8d0b206d48080f938a8b25361e19432d2c9db40d2899c810a"},
-    {file = "virtualenv-20.35.3.tar.gz", hash = "sha256:4f1a845d131133bdff10590489610c98c168ff99dc75d6c96853801f7f67af44"},
+    {file = "virtualenv-20.35.4-py3-none-any.whl", hash = "sha256:c21c9cede36c9753eeade68ba7d523529f228a403463376cf821eaae2b650f1b"},
+    {file = "virtualenv-20.35.4.tar.gz", hash = "sha256:643d3914d73d3eeb0c552cbb12d7e82adf0e504dbf86a3182f8771a153a1971c"},
 ]
 
 [package.dependencies]
