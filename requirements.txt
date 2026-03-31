@@ -7,8 +7,9 @@ charset-normalizer==3.4.6
 cleo==2.1.0
 click==8.3.1
 crashtest==0.4.1
+cryptography==46.0.6
 distlib==0.4.0
--e git+https://github.com/mragusa/dns-traffic-analysis.git@81316f61863d5a27bc0ba81c5cd8710be995b317#egg=dns_traffic_analysis
+-e git+https://github.com/mragusa/dns-traffic-analysis.git@e15da39a9b0a669ec54228c4b9d22c4a0fb19b9e#egg=dns_traffic_analysis
 dulwich==1.1.0
 fastjsonschema==2.21.2
 filelock==3.25.2
