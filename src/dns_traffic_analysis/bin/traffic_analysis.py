@@ -1,14 +1,16 @@
 #!/usr/bin/env python3 -O
 
 import argparse
-import statistics
 import cProfile
-from tqdm import tqdm
 import logging
+import statistics
+
+from rich import print
+from tqdm import tqdm
 
 # Disable warning messages on startup
 logging.getLogger("scapy").setLevel(logging.ERROR)
-from scapy.all import IP, IPv6, UDP, DNS, DNSQR, DNSRR, PcapReader
+from scapy.all import DNS, DNSQR, DNSRR, IP, IPv6, PcapReader
 
 
 class DnsAnalyzer:
@@ -126,7 +128,7 @@ class DnsAnalyzer:
 
     def process_packet(self, packet):
         if self.verbose:
-            print(packet)
+            print(f"Debug: {packet}")
         if DNS in packet and (
             (
                 IP in packet
@@ -144,35 +146,46 @@ class DnsAnalyzer:
         ):
             dns = packet.getlayer(DNS)
             if self.verbose:
-                print(dns)  # Corrected indentation
-            if dns is not None:
-                if DNSQR in dns:
-                    if (IP in packet and (packet[IP].dst == self.source_ip)) or (
-                        IPv6 in packet and (packet[IPv6].dst == self.source_ip)
-                    ):
-                        self.queries_received.append(
+                print(f"Debug: {dns}")  # Corrected indentation
+            if dns is not None and DNSQR in dns:
+                if (IP in packet and (packet[IP].dst == self.source_ip)) or (
+                    IPv6 in packet and (packet[IPv6].dst == self.source_ip)
+                ):
+                    self.queries_received.append(
+                        {
+                            "query_id": dns.id,
+                            "query_request": dns.qd.qname,
+                            "query_time": packet.time,
+                        }
+                    )
+                    if dns.qd.qtype not in self.recordtypes:
+                        self.recordtypes[dns.qd.qtype] = 1
+                    else:
+                        self.recordtypes[dns.qd.qtype] += 1
+
+                    if dns.qd.qname not in self.recordname:
+                        self.recordname[dns.qd.qname] = 1
+                        self.recordname_id[dns.qd.qname] = [dns.id]
+                    else:
+                        self.recordname[dns.qd.qname] += 1
+                        self.recordname_id[dns.qd.qname].append(dns.id)
+                if (IP in packet and (packet[IP].src == self.source_ip)) or (
+                    IPv6 in packet and (packet[IPv6].src == self.source_ip)
+                ):
+                    if isinstance(dns.an, DNSRR):
+                        response_name = dns.an.rrname
+                        self.responses_sent.append(
                             {
                                 "query_id": dns.id,
-                                "query_request": dns.qd.qname,
-                                "query_time": packet.time,
+                                "response_time": packet.time,
+                                "rrname": response_name,
                             }
                         )
-                        if dns.qd.qtype not in self.recordtypes:
-                            self.recordtypes[dns.qd.qtype] = 1
-                        else:
-                            self.recordtypes[dns.qd.qtype] += 1
-
-                        if dns.qd.qname not in self.recordname:
-                            self.recordname[dns.qd.qname] = 1
-                            self.recordname_id[dns.qd.qname] = [dns.id]
-                        else:
-                            self.recordname[dns.qd.qname] += 1
-                            self.recordname_id[dns.qd.qname].append(dns.id)
-                    if (IP in packet and (packet[IP].src == self.source_ip)) or (
-                        IPv6 in packet and (packet[IPv6].src == self.source_ip)
-                    ):
-                        if isinstance(dns.an, DNSRR):
-                            response_name = dns.an.rrname
+                        if self.verbose:
+                            print(f"Debug: {dns.id}, {dns.qd.qname}, {packet.time}")
+                    elif isinstance(dns.an, list):
+                        for response in dns.an:
+                            response_name = response.rrname
                             self.responses_sent.append(
                                 {
                                     "query_id": dns.id,
@@ -182,39 +195,23 @@ class DnsAnalyzer:
                             )
                             if self.verbose:
                                 print(
-                                    "{}{}{}".format(dns.id, dns.qd.qname, packet.time)
+                                    f"Debug: {dns.id}, {packet.time}, {response_name}"
                                 )
-                        elif isinstance(dns.an, list):
-                            for response in dns.an:
-                                response_name = response.rrname
-                                self.responses_sent.append(
-                                    {
-                                        "query_id": dns.id,
-                                        "response_time": packet.time,
-                                        "rrname": response_name,
-                                    }
-                                )
-                                if self.verbose:
-                                    print(
-                                        "{}{}{}".format(
-                                            dns.id, packet.time, response_name
-                                        )
-                                    )
 
     def process_latency(self, query):
         if self.verbose:
-            print("Query: {}".format(query))
+            print(f"Debug: Query: {query}")
         query_id = query["query_id"]
         query_match = next(
             (resp for resp in self.responses_sent if resp["query_id"] == query_id),
             None,
         )
         if self.verbose:
-            print("Query Match: {}".format(query_match))
+            print(f"Debug: Query Match: {query_match}")
         if query_match:
             latency_time = query_match["response_time"] - query["query_time"]
             if self.verbose:
-                print("Query ID: {}, Latency Time: {}".format(query_id, latency_time))
+                print(f"Debug: Query ID: {query_id}, Latency Time: {latency_time}")
             self.latency_times.append(latency_time)
             if latency_time > self.time_delay:
                 self.slow_queries.append(
@@ -225,7 +222,7 @@ class DnsAnalyzer:
                     }
                 )
                 if self.verbose:
-                    print("Slow query appended")
+                    print("Debug: Slow query appended")
 
     def analyze(self):
         total_packets = 0
@@ -235,34 +232,26 @@ class DnsAnalyzer:
                 total_packets += 1
 
         print(
-            "\033[94mTotal packets found {} in {}\033[0m".format(
-                total_packets, self.capture_file
-            )
+            f"[blue]Total packets found {total_packets} in {self.capture_file}[/blue]"
         )
         print()
         # Add the tqdm progress bar to the loop
-        with tqdm(
-            total=total_packets,
-            desc="Processing packets",
-            unit="packets",
-            colour="blue",
-        ) as pbar:
-            with PcapReader(self.capture_file) as packets:
-                for packet in packets:
-                    self.process_packet(packet)
-                    pbar.update(1)  # Update the progress bar
+        with (
+            tqdm(
+                total=total_packets,
+                desc="Processing packets",
+                unit="packets",
+                colour="blue",
+            ) as pbar,
+            PcapReader(self.capture_file) as packets,
+        ):
+            for packet in packets:
+                self.process_packet(packet)
+                pbar.update(1)  # Update the progress bar
 
         print()
-        print(
-            "\033[94mNumber of queries received: {}\033[0m".format(
-                len(self.queries_received)
-            )
-        )
-        print(
-            "\033[94mNumber of responses sent: {}\033[0m".format(
-                len(self.responses_sent)
-            )
-        )
+        print(f"[blue]Number of queries received: {len(self.queries_received)}[/blue]")
+        print(f"[blue]Number of responses sent: {len(self.responses_sent)}[/blue]")
         print()
 
         with tqdm(
@@ -276,16 +265,14 @@ class DnsAnalyzer:
                 pbar.update(1)
         print()
         print(
-            "\033[94mTotal Slow Queries\033[0m: \033[93m{}\033[0m".format(
-                len(self.slow_queries)
-            )
+            f"[blue]Total Slow Queries[/blue]: [yellow]{len(self.slow_queries)}[/yellow]"
         )
-        print("\033[92mSaving slow queries to file\033[0m")
+        print("[green]Saving slow queries to file[/green]")
         with open(self.file, "w") as f:
             for query in self.slow_queries:
                 f.write(str(query) + "\n")
         print()
-        print("\033[95mProcessing Latency Times\033[0m")
+        print("[purple]Processing Latency Times[/purple]")
         print()
         if self.latency_times:
             lowest_latency = min(self.latency_times)
@@ -296,45 +283,42 @@ class DnsAnalyzer:
             count = len(self.latency_times)
             mean_latency = total_sum / count
 
-            print("\033[94mLowest Latency: {}\033[0m".format(lowest_latency))
-            print("\033[91mHighest Latency: {}\033[0m".format(highest_latency))
-            print("\033[93mMedian Latency: {}\033[0m".format(median_latency))
-            print("\033[92mMean Latency: {}\033[0m".format(mean_latency))
+            print(f"[blue]Lowest Latency: {lowest_latency}[/blue]")
+            print(f"[red]Highest Latency: {highest_latency}[/blue]")
+            print(f"[yellow]Median Latency: {median_latency}[/yellow]")
+            print(f"[green]Mean Latency: {mean_latency}[/green]")
 
         total = total_packets
         slow = len(self.slow_queries)
         percentage_difference = ((total - slow) / total) * 100
         print()
-        print("\033[94mTotal Packets: {}\033[0m".format(total))
-        print("\033[91mSlow Queries: {}\033[0m".format(slow))
-        print("\033[94mPercentage Difference: {}%\033[0m".format(percentage_difference))
+        print(f"[blue]Total Packets: {total}[/blue]")
+        print(f"[red]Slow Queries: {slow}[/red]")
+        print(f"[blue]Percentage Difference: {percentage_difference}%[/blue]")
         print()
         sorted_recordname = sorted(
             self.recordname.items(), key=lambda x: x[1], reverse=True
         )
-        print("\033[92mSaving Total Names Queried Report\033[0m")
+        print("[green]Saving Total Names Queried Report[/green]")
         print()
         if self.verbose:
             for i in sorted_recordname:
-                print("Query and Count: {}".format(i))
+                print(f"Debug: Query and Count: {i}")
         with open(self.report, "w") as f:
             for query, count in sorted_recordname:
                 f.write(
-                    "Query: {} Count: {} Query ID: {}\n".format(
-                        query, count, self.recordname_id[query]
-                    )
+                    f"Query: {query} Count: {count} Query ID: {self.recordname_id[query]}\n"
                 )
 
-        print("\033[94mTotal Record Types Queried\033[0m")
+        print("[blue]Total Record Types Queried[/blue]")
         for i in self.recordtypes:
             print(
-                "\033[94mType:\033[0m {} \033[96mCount:\033[0m {}".format(
-                    self.record_type_lookup[i], self.recordtypes[i]
-                )
+                f"[blue]Type:[/blue] {self.record_type_lookup[i]} [cyan]Count:[/cyan] {self.recordtypes[i]}"
             )
 
 
 def main():
+    # TODO: covert argparse to click
     parser = argparse.ArgumentParser(
         description="Script to parse traffic capture files for slow queries",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -368,7 +352,7 @@ def main():
 
 if __debug__:
     # Run the script without -O to enable the cProfile debug mode
-    print("cProfile Enabled")
+    print("Debug: cProfile Enabled")
     cProfile.run("main()")
 else:
     if __name__ == "__main__":
