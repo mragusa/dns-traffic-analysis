@@ -284,7 +284,7 @@ class DnsAnalyzer:
             mean_latency = total_sum / count
 
             print(f"[blue]Lowest Latency: {lowest_latency}[/blue]")
-            print(f"[red]Highest Latency: {highest_latency}[/blue]")
+            print(f"[red]Highest Latency: {highest_latency}[/red]")
             print(f"[yellow]Median Latency: {median_latency}[/yellow]")
             print(f"[green]Mean Latency: {mean_latency}[/green]")
 
@@ -312,9 +312,14 @@ class DnsAnalyzer:
 
         print("[blue]Total Record Types Queried[/blue]")
         for i in self.recordtypes:
-            print(
-                f"[blue]Type:[/blue] {self.record_type_lookup[i]} [cyan]Count:[/cyan] {self.recordtypes[i]}"
-            )
+            if i in self.record_type_lookup:
+                print(
+                    f"[blue]Type:[/blue] {self.record_type_lookup[i]} [cyan]Count:[/cyan] {self.recordtypes[i]}"
+                )
+            else:
+                print(
+                    f"[red]Unknown Type:[/red] {i} [cyan]Count:[/cyan] {self.recordtypes[i]}"
+                )
 
 
 def main():
