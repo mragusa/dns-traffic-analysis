@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
-import cProfile
 import argparse
+import cProfile
 
 # Disable warning log messages
 import logging
 
 logging.getLogger("scapy").setLevel(logging.CRITICAL)
 
-from scapy.all import rdpcap, IP, IPv6, UDP, TCP
+from scapy.all import IP, TCP, UDP, IPv6, rdpcap
 
 dns_servers_found = {}
 recursive_dns_servers = {}
@@ -63,7 +63,7 @@ def find_dns_servers(packet):
                 dns_clients[packet[IPv6].dst] = 1
 
 
-def main(file: str, display: bool, count: int, focus: list):
+def main(file: str, display: bool, count: int, focus: str):
     type_choice = {}
     if file:
         packet_file = rdpcap(file)
@@ -71,9 +71,9 @@ def main(file: str, display: bool, count: int, focus: list):
             find_dns_servers(packet)
 
         # Find recursive DNS servers
-        for c in dns_clients:
+        for c, value in dns_clients:
             if c in dns_servers_found:
-                query_count = dns_clients[c] + dns_servers_found[c]
+                query_count = value + dns_servers_found[c]
                 recursive_dns_servers[c] = query_count
         # Clean recursive servers from dns_servers and dns_clients
         for r in recursive_dns_servers:
@@ -108,13 +108,10 @@ def main(file: str, display: bool, count: int, focus: list):
             if count:
                 c = 0
                 # adjust count if results are less than count
-                if len(type_choice[focus]) < count:
-                    count = len(type_choice[focus])
+                count = min(count, len(type_choice[focus]))
                 while c < count:
                     for n in type_choice[focus]:
-                        print(
-                            "{}: {} Count: {}".format(focus, n, type_choice[focus][n])
-                        )
+                        print(f"{focus}: {n} Count: {type_choice[focus][n]}")
                         if c == count:
                             break
                         else:
@@ -122,28 +119,23 @@ def main(file: str, display: bool, count: int, focus: list):
             else:
                 if type_choice:
                     for n in type_choice[focus]:
-                        print(
-                            "{}: {} Count: {}".format(focus, n, type_choice[focus][n])
-                        )
+                        print(f"{focus}: {n} Count: {type_choice[focus][n]}")
                 else:
                     if focus:
-                        print("No {} data found".format(focus))
+                        print(f"No {focus} data found")
                     else:
                         print("Please pick data focus to display")
         else:
-            print("Total DNS servers found: {}".format(len(dns_servers_found)))
-            print(
-                "Total recursive DNS servers found: {}".format(
-                    len(recursive_dns_servers)
-                )
-            )
-            print("Total DNS clients found: {}".format(len(dns_clients)))
+            print(f"Total DNS servers found: {len(dns_servers_found)}")
+            print(f"Total recursive DNS servers found: {len(recursive_dns_servers)}")
+            print(f"Total DNS clients found: {len(dns_clients)}")
 
     else:
         print("File argument not declared")
 
 
 if __name__ == "__main__":
+    # TODO: Convert argparse to click
     parser = argparse.ArgumentParser(
         description="Parse pcap files to file DNS servers",
         epilog="Identify DNS servers and clients from a PCAP file",
