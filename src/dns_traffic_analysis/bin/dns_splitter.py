@@ -5,8 +5,9 @@ import logging
 
 logging.getLogger("scapy").setLevel(logging.CRITICAL)
 
-from scapy.all import *
 import argparse
+
+from scapy.all import *
 
 
 def write(pkt, dnsid):
@@ -14,16 +15,15 @@ def write(pkt, dnsid):
 
 
 def splitpcap(pcap, dnsid):
-    print("Opening file: {}".format(pcap))
-    print("Searching for Query ID: {}".format(dnsid))
+    print(f"Opening file: {pcap}")
+    print(f"Searching for Query ID: {dnsid}")
     pckts = rdpcap(pcap)
     for p in pckts:
         if DNS in p:
             dns = p.getlayer(DNS)
-            if dns is not None:
-                if dns.id == int(dnsid):
-                    print("Transaction ID match found for {}".format(dns.id))
-                    write(p, dnsid)
+            if dns is not None and dns.id == int(dnsid):
+                print(f"Transaction ID match found for {dns.id}")
+                write(p, dnsid)
 
 
 def main():
