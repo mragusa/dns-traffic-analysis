@@ -4,30 +4,29 @@
 # Add server query output file
 # Add % of success vs failures
 
-import click
-from tqdm import tqdm
-from rich.console import Console
-from rich.table import Table
-from collections import defaultdict
-
 # Disable scapy warnings
 import logging
+from collections import defaultdict
+
+import click
+from rich.console import Console
+from rich.table import Table
+from tqdm import tqdm
 
 logging.getLogger("scapy").setLevel(logging.ERROR)
 from scapy.all import (
-    PcapReader,
+    DNS,
+    DNSQR,
+    ICMP,
     IP,
-    IPv6,
     TCP,
     UDP,
     Dot1Q,
-    DNS,
-    DNSQR,
-    DNSRR,
-    UDPerror,
-    TCPerror,
-    ICMP,
     IPerror,
+    IPv6,
+    PcapReader,
+    TCPerror,
+    UDPerror,
 )
 
 dns_clients = defaultdict(lambda: defaultdict(int))
@@ -266,20 +265,20 @@ def main(
     """Report on DNS Statistics in PCAP File"""
     console = Console()
     total_packets = 0
-    print("Processing File: {}".format(file))
+    print(f"Processing File: {file}")
     with PcapReader(file) as packets:
         for _ in packets:
             total_packets += 1
-    console.print(
-        "[bold cyan]Total Packets Found: {}[/bold cyan]".format(total_packets)
-    )
-    with tqdm(
-        total=total_packets, desc="Analyzing Capture", unit="packets", colour="blue"
-    ) as pbar:
-        with PcapReader(file) as packets:
-            for packet in packets:
-                process_packet(packet, verbose)
-                pbar.update(1)
+    console.print(f"[bold cyan]Total Packets Found: {total_packets}[/bold cyan]")
+    with (
+        tqdm(
+            total=total_packets, desc="Analyzing Capture", unit="packets", colour="blue"
+        ) as pbar,
+        PcapReader(file) as packets,
+    ):
+        for packet in packets:
+            process_packet(packet, verbose)
+            pbar.update(1)
     if clients:
         for c in sorted(dns_clients):
             for q in dns_clients[c]:
@@ -496,16 +495,17 @@ def process_packet(packet, verbose: bool):
                     (dns.get_field("rcode").i2s.get(dns.rcode, dns.rcode))
                 ] += 1
         else:
-            print("Unconsidered: {}".format(packet))
-    if ICMP in packet:
-        if (UDPerror in packet and packet[UDPerror].sport == 53) or (
-            TCPerror in packet and packet[TCPerror].sport == 53
-        ):
-            if packet[ICMP].code:
-                icmp_code = icmp_type[packet[ICMP].type][packet[ICMP].code]
-            else:
-                icmp_code = icmp_type[packet[ICMP].code]
-            icmp_client_errors[packet[IPerror].src][packet[IPerror].dst][icmp_code] += 1
+            print(f"Unconsidered: {packet}")
+    if (
+        ICMP in packet
+        and (UDPerror in packet and packet[UDPerror].sport == 53)
+        or (TCPerror in packet and packet[TCPerror].sport == 53)
+    ):
+        if packet[ICMP].code:
+            icmp_code = icmp_type[packet[ICMP].type][packet[ICMP].code]
+        else:
+            icmp_code = icmp_type[packet[ICMP].code]
+        icmp_client_errors[packet[IPerror].src][packet[IPerror].dst][icmp_code] += 1
 
 
 def display_report(report_name: str, data: dict):
@@ -513,42 +513,42 @@ def display_report(report_name: str, data: dict):
     if report_name == "Query Types":
         table.add_column("Type", justify="center")
         table.add_column("Count", justify="center")
-        for qt in data:
-            table.add_row(record_type_lookup[qt], str(data[qt]))
+        for qt, value in data.items():
+            table.add_row(record_type_lookup[qt], str(value))
     if report_name == "Op Codes":
         table.add_column("Code", justify="center")
         table.add_column("Count", justify="center")
-        for oc in data:
-            table.add_row(op_code_def[oc], str(data[oc]))
+        for oc, value in data.items():
+            table.add_row(op_code_def[oc], str(value))
     if report_name == "Success Rates":
         table.add_column("RCode", justify="center")
         table.add_column("Count", justify="center")
-        for r in data:
+        for r, value in data.items():
             if r in extended_rcodes:
-                table.add_row(extended_rcodes[r], str(data[r]))
+                table.add_row(extended_rcodes[r], str(value))
             else:
-                table.add_row(r, str(data[r]))
+                table.add_row(r, str(value))
     if report_name == "DNS Notifies":
         table.add_column("SRC", justify="center")
         table.add_column("DST", justify="center")
         table.add_column("Count", justify="center")
-        for n in data:
-            table.add_row(n[0], n[2], str(data[n]))
+        for n, value in data.items():
+            table.add_row(n[0], n[2], str(value))
     if report_name == "ICMP Errors":
         table.add_column("SRC", justify="center")
         table.add_column("DST", justify="center")
         table.add_column("Description", justify="center")
         table.add_column("Count", justify="center")
         for s in icmp_client_errors:
-            if s in dns_clients.keys():
+            if s in dns_clients:
                 for d in icmp_client_errors[s]:
                     for c in icmp_client_errors[s][d]:
                         table.add_row(s, d, c, str(icmp_client_errors[s][d][c]))
     if report_name == "VLANs":
         table.add_column("VLAN", justify="center")
         table.add_column("Count", justify="center")
-        for v in data:
-            table.add_row(str(v), str(data[v]))
+        for v, value in data.items():
+            table.add_row(str(v), str(value))
     console = Console()
     console.print(table)
 
