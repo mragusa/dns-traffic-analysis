@@ -5,9 +5,10 @@ import logging
 
 logging.getLogger("scapy").setLevel(logging.CRITICAL)
 
-from scapy.all import *
 import argparse
 import time
+
+from scapy.all import *
 
 
 def process_dns_packet(packet, packet_time):
